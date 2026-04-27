@@ -36,7 +36,7 @@ export default function Home() {
         <ImageTabs />
 
         {/* Features Section */}
-        <section className="border-t bg-white py-24">
+        <section className="border-t bg-white py-24 px-12">
           <div className="container mx-auto px-4">
             <div className="grid gap-12 md:grid-cols-3">
               <div className="flex flex-col">
