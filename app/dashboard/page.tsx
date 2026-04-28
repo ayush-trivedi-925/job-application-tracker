@@ -2,17 +2,13 @@ import KanbanBoard from "@/components/kanban-board";
 import { getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function Dashboard() {
-  const session = await getSession();
-
-  if (!session) {
-    redirect("/sign-in");
-  }
-
+async function getBoardData(userId: string) {
+  "use cache";
   const boardData = await prisma.board.findFirst({
     where: {
-      userId: session?.user.id,
+      userId: userId,
       name: "Job Hunt",
     },
     include: {
@@ -23,6 +19,17 @@ export default async function Dashboard() {
       },
     },
   });
+  return boardData;
+}
+
+async function DashboardPageWrapper() {
+  const session = await getSession();
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  const boardData = await getBoardData(session.user.id);
 
   return (
     <div className="min-h-screen">
@@ -34,5 +41,13 @@ export default async function Dashboard() {
         <KanbanBoard board={boardData} userId={session.user.id} />
       </div>
     </div>
+  );
+}
+
+export default async function Dashboard() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <DashboardPageWrapper />
+    </Suspense>
   );
 }

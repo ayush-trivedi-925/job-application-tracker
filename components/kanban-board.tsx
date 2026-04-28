@@ -21,6 +21,7 @@ import {
 import { Button } from "./ui/button";
 import CreateJobApplicationDialog from "./create-job-application-dialog";
 import JobApplicationCard from "./job-application-card";
+import { useBoard } from "@/lib/hooks/useBoards";
 
 type Board = Prisma.BoardGetPayload<{
   include: {
@@ -144,12 +145,13 @@ function SortableJobCard({
 
 function KanbanBoard({ board, userId }: KanbanBoardProps) {
   if (!board) return <div>No board found</div>;
-  const columns = board.columns;
-  const sortedColumns = columns.sort((a, b) => a.order - b.order) || [];
+
+  const { columns, moveJob } = useBoard(board);
+  const sortedColumns = columns!.sort((a, b) => a.order - b.order) || [];
   return (
     <div>
       <div>
-        {columns.map((col, key) => {
+        {columns!.map((col, key) => {
           const config = COLUMN_CONFIG[key] || {
             color: "bg-cyan-500",
             icon: <Calendar />,
